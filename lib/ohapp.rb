@@ -9,6 +9,8 @@ class OHApp
   OPENHAB_SERVER = "localhost"
   OPENHAB_PORT = 8080
   OPENHAB_V2   = false
+  OPENHAB_USER = ""
+  OPENHAB_PASSWORD = ""
 
   attr_reader :temperature, :currentConditions, :humidity, :pressure, :precipitation, :windSpeed, :temperatureLow, 
     :temperatureHigh, :weatherIcon, :weatherCode, :tomorrowTemperatureLow, :tomorrowTemperatureHigh, :tomorrowWeatherIcon, :tomorrowPrecipitation,
@@ -42,7 +44,11 @@ class OHApp
   def getState(itemID, data)
     http = Net::HTTP.new(OPENHAB_SERVER, OPENHAB_PORT)
     http.use_ssl = false
-    response = http.request(Net::HTTP::Get.new("/rest/items/#{itemID}?type=json"))
+    request = Net::HTTP::Get.new("/rest/items/#{itemID}?type=json")
+    if !OPENHAB_USER.empty
+       request.basic_auth(OPENHAB_USER,OPENHAB_PASSWORD)
+    end
+    response = http.request(request)
     puts response.body()
     response.body()
   end
@@ -59,7 +65,11 @@ class OHApp
       response = http.request(request)
     else
       #openHAB 1.x endpoint
-      response = http.request(Net::HTTP::Get.new("/CMD?#{itemID}=#{newState}")) 
+      equest = Net::HTTP::Get.new("/CMD?#{itemID}=#{newState}")
+      if !OPENHAB_USER.empty
+        request.basic_auth(OPENHAB_USER,OPENHAB_PASSWORD)
+      end
+      response = http.request(request)
     end      
     puts response.body()
     response.body()
@@ -68,7 +78,11 @@ class OHApp
   def refreshWeather()
     http = Net::HTTP.new(OPENHAB_SERVER, OPENHAB_PORT)
     http.use_ssl = false
-    response = http.request(Net::HTTP::Get.new("/rest/items/Weather?type=json"))
+    request = Net::HTTP::Get.new("/rest/items/gWeather?type=json")
+    if !OPENHAB_USER.empty
+       request.basic_auth(OPENHAB_USER,OPENHAB_PASSWORD)
+    end
+    response = http.request(request)
     #puts response.body()
     data = JSON.parse(response.body())
     #puts data
