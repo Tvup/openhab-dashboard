@@ -65,7 +65,7 @@ class OHApp
       response = http.request(request)
     else
       #openHAB 1.x endpoint
-      equest = Net::HTTP::Get.new("/CMD?#{itemID}=#{newState}")
+      request = Net::HTTP::Get.new("/CMD?#{itemID}=#{newState}")
       if !OPENHAB_USER.empty
         request.basic_auth(OPENHAB_USER,OPENHAB_PASSWORD)
       end
